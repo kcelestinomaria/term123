@@ -2,7 +2,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 from model import Product
-from database import get_all_products, delete_product, insert_product, complete_product, update_product
+from database import get_all_products, delete_product, insert_product, buy_product, update_product
 
 
 console = Console()
@@ -32,9 +32,9 @@ def update(position: int, product: str = "", category: str = ""):
     show()
 
 @app.command()
-def complete(position: int):
+def buy(position: int):
     typer.echo(f"complete {position}")
-    complete_product(position-1)
+    buy_product(position-1)
     show()
 
 @app.command()
