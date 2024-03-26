@@ -26,7 +26,7 @@ def insert_product(product: Product):
     count = c.fetchone()[0]
     product.position = count if count else 0
     with conn: # parameter substitution below is what prevents SQL INJECTION Attacks
-        c.execute('INSERT INTO products VALUES (:product :category, :date_added, :date_completed, :status, :position)' ,
+        c.execute('INSERT INTO products VALUES (:product, :category, :date_added, :date_completed, :status, :position)' ,
         {'product': product.product, 'category': product.category, 'date_added': product.date_added, 
         'date_completed': product.date_completed, 'status': product.status, 'position': product.position })
 
@@ -68,3 +68,9 @@ def update_product(position: int, product: str, category: str):
         elif category is not None:
             c.execute('UPDATE products SET category = :category WHERE position = :position',
             {'position': position, 'category': category})
+
+def complete_product(position: int):
+    with conn:
+        c.execute('UPDATE products SET status = 2, date_completed = :date_completed WHERE position = :position',
+        {'position': position, 'date_completed': datetime.datetime.now().isoformat()})
+

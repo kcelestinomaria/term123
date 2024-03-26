@@ -1,6 +1,8 @@
 import typer
 from rich.console import Console
 from rich.table import Table
+from model import Product
+from database import get_all_products, delete_product, insert_product, complete_product, update_product
 
 
 console = Console()
@@ -11,26 +13,33 @@ app = typer.Typer()
 @app.command(short_help='adds a product')
 def add(product: str, category: str):
     typer.echo(f"adding {product}, {category}")
+
+    product = Product(product, category)
+    insert_product(product)
     show()
 
 @app.command(short_help='deletes a product')
 def delete(position: int):
     typer.echo(f"deleting {position}")
+    # indices in UI begin at 1, but in database at 0
+    delete_product(position-1)
     show()
 
 @app.command(short_help='updates a product')
 def update(position: int, product: str = "", category: str = ""):
     typer.echo(f"updating {position}")
+    update_product(position-1, product, category)
     show()
 
 @app.command()
 def complete(position: int):
     typer.echo(f"complete {position}")
+    complete_product(position-1)
     show()
 
 @app.command()
 def show():
-    products = [("Samsung Galaxy Pro Tab", "Tablets"), ("Lenovo Laptop", "Laptops")]
+    products = get_all_products()
     console.print("[bold magenta]Products[/bold magenta]!", "")
 
     table = Table(show_header=True, header_style="bold blue")
@@ -46,9 +55,9 @@ def show():
         return 'white'
 
     for idx, product in enumerate(products, start=1):
-        c = get_category_color(product[1])
-        is_purchased_str = ':true' if True == 2 else ':false'
-        table.add_row(str(idx), product[0], f'[{c}]{product[1]}[/{c}]', is_purchased_str)
+        c = get_category_color(product.category)
+        is_purchased_str = ':true' if product.status == 2 else ':false'
+        table.add_row(str(idx), product.product, f'[{c}]{product.category}[/{c}]', is_purchased_str)
 
     console.print(table)
 
